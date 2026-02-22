@@ -9,10 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -61,16 +58,9 @@ import kotlin.random.Random
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MaterialTheme {
-                RemiScorerApp(applicationContext)
-            }
-        }
+        setContent { MaterialTheme { RemiScorerApp(applicationContext) } }
     }
 }
-
-@Serializable
-data class Player(val name: String, val totals: Int = 0)
 
 @Serializable
 data class MatchRound(val scores: List<Int>)
@@ -100,13 +90,15 @@ class Storage(context: Context) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+private fun Match.totals(): List<Int> = players.indices.map { idx -> rounds.sumOf { it.scores[idx] } }
+private fun Match.winnerIndex(): Int = totals().indices.minByOrNull { totals()[it] } ?: 0
+
 @Composable
 fun RemiScorerApp(context: Context) {
     val storage = remember { Storage(context) }
     var state by remember { mutableStateOf(storage.load()) }
     val nav = rememberNavController()
-    val snack = remember { SnackbarHostState() }
+    val snackbarHost = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     fun persist(newState: AppState) {
@@ -114,7 +106,7 @@ fun RemiScorerApp(context: Context) {
         storage.save(newState)
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snack) }) { pad ->
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHost) }) { pad ->
         NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(pad)) {
             composable("home") {
                 HomeScreen(
@@ -126,10 +118,13 @@ fun RemiScorerApp(context: Context) {
                 )
             }
             composable("new") {
-                NewMatchScreen(onBack = { nav.popBackStack() }, onCreate = { match ->
-                    persist(state.copy(activeMatch = match))
-                    nav.navigate("active") { popUpTo("home") }
-                })
+                NewMatchScreen(
+                    onBack = { nav.popBackStack() },
+                    onCreate = { match ->
+                        persist(state.copy(activeMatch = match))
+                        nav.navigate("active") { popUpTo("home") }
+                    }
+                )
             }
             composable("active") {
                 val match = state.activeMatch
@@ -141,8 +136,13 @@ fun RemiScorerApp(context: Context) {
                         onBack = { nav.popBackStack() },
                         onUpdate = { updated -> persist(state.copy(activeMatch = updated)) },
                         onFinish = { finalMatch ->
-                            persist(state.copy(activeMatch = null, history = listOf(finalMatch.copy(finished = true)) + state.history))
-                            scope.launch { snack.showSnackbar("Meci salvat în istoric") }
+                            persist(
+                                state.copy(
+                                    activeMatch = null,
+                                    history = listOf(finalMatch.copy(finished = true)) + state.history
+                                )
+                            )
+                            scope.launch { snackbarHost.showSnackbar("Meci salvat în istoric") }
                             nav.navigate("home") { popUpTo("home") { inclusive = true } }
                         }
                     )
@@ -157,19 +157,21 @@ fun RemiScorerApp(context: Context) {
                 )
             }
             composable("details/{id}", arguments = listOf(navArgument("id") { type = NavType.LongType })) { back ->
-                val match = state.history.firstOrNull { it.id == back.arguments?.getLong("id") }
-                if (match != null) MatchDetailsScreen(match = match, onBack = { nav.popBackStack() })
+                state.history.firstOrNull { it.id == back.arguments?.getLong("id") }?.let { match ->
+                    MatchDetailsScreen(match = match, onBack = { nav.popBackStack() })
+                }
             }
-            composable("stats") {
-                StatsScreen(history = state.history, onBack = { nav.popBackStack() })
-            }
+            composable("stats") { StatsScreen(history = state.history, onBack = { nav.popBackStack() }) }
         }
     }
 }
 
 @Composable
 fun HomeScreen(hasActive: Boolean, onNew: () -> Unit, onContinue: () -> Unit, onHistory: () -> Unit, onStats: () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         Text("Scor REMI", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Button(onClick = onNew, modifier = Modifier.fillMaxWidth()) { Text("Meci nou") }
         if (hasActive) Button(onClick = onContinue, modifier = Modifier.fillMaxWidth()) { Text("Continuă meciul") }
@@ -186,25 +188,52 @@ fun NewMatchScreen(onBack: () -> Unit, onCreate: (Match) -> Unit) {
     var target by remember { mutableStateOf("1000") }
     val generated = listOf("Bătălia cărților rebele", "Remiul legendar de pe canapea", "Duelul asului pierdut")
 
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
         Text("Meci nou", style = MaterialTheme.typography.headlineSmall)
         OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Denumire meci") }, modifier = Modifier.fillMaxWidth())
         Button(onClick = { name = generated.random() }) { Text("Generează nume") }
+
         Text("Număr jucători")
-        Row { (2..4).forEach { n -> Row(verticalAlignment = Alignment.CenterVertically) { RadioButton(selected = players == n, onClick = { players = n }); Text("$n") } } }
-        repeat(players) { i ->
-            OutlinedTextField(value = playerNames[i], onValueChange = { playerNames[i] = it }, label = { Text("Jucător ${i + 1}") }, modifier = Modifier.fillMaxWidth())
+        Row {
+            (2..4).forEach { n ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = players == n, onClick = { players = n })
+                    Text("$n")
+                }
+            }
         }
+
+        repeat(players) { i ->
+            OutlinedTextField(
+                value = playerNames[i],
+                onValueChange = { playerNames[i] = it },
+                label = { Text("Jucător ${i + 1}") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
         OutlinedTextField(value = target, onValueChange = { target = it.filter(Char::isDigit) }, label = { Text("Scor de câștig") }, modifier = Modifier.fillMaxWidth())
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(500, 1000, 1500, 2000).forEach { v -> Button(onClick = { target = "$v" }) { Text("$v") } }
         }
+
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton(onClick = onBack) { Text("Înapoi") }
             Button(onClick = {
                 val safePlayers = (0 until players).map { i -> playerNames[i].ifBlank { "Jucător ${i + 1}" } }
                 val title = name.ifBlank { "Meci REMI ${SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date())}" }
-                onCreate(Match(id = Random.nextLong(), name = title, startDate = System.currentTimeMillis(), targetScore = target.toIntOrNull() ?: 1000, players = safePlayers))
+                onCreate(
+                    Match(
+                        id = Random.nextLong(),
+                        name = title,
+                        startDate = System.currentTimeMillis(),
+                        targetScore = target.toIntOrNull() ?: 1000,
+                        players = safePlayers
+                    )
+                )
             }) { Text("Start") }
         }
     }
@@ -212,44 +241,56 @@ fun NewMatchScreen(onBack: () -> Unit, onCreate: (Match) -> Unit) {
 
 @Composable
 fun ActiveMatchScreen(match: Match, onBack: () -> Unit, onUpdate: (Match) -> Unit, onFinish: (Match) -> Unit) {
-    val currentTotals = match.players.mapIndexed { i, _ -> match.rounds.sumOf { it.scores[i] } }
-    val ranking = match.players.indices.sortedBy { currentTotals[it] }
+    val totals = match.totals()
+    val ranking = match.players.indices.sortedBy { totals[it] }
     val inputs = remember(match.rounds.size) { mutableStateListOf(*Array(match.players.size) { "0" }) }
     var confirmUndo by remember { mutableStateOf(false) }
-    var showWinner by remember { mutableStateOf(currentTotals.any { it >= match.targetScore }) }
+    var showWinner by remember { mutableStateOf(false) }
+    var showInfo by remember { mutableStateOf(false) }
+
+    LaunchedEffect(match.rounds.size) {
+        if (match.rounds.isNotEmpty() && totals.any { it >= match.targetScore }) showWinner = true
+    }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(match.name, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+            TextButton(onClick = { showInfo = true }) { Text("ℹ️") }
             TextButton(onClick = onBack) { Text("Acasă") }
         }
+
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(12.dp)) {
                 Text("Clasament")
-                ranking.forEachIndexed { idx, p ->
+                ranking.forEachIndexed { idx, playerIndex ->
                     val leaderBg = if (idx == 0) Color(0xFFDFF7DF) else Color.Transparent
                     Row(
                         modifier = Modifier.fillMaxWidth().background(leaderBg).padding(4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Loc ${idx + 1}: ${match.players[p]}")
-                        Text("${currentTotals[p]} pct")
+                        Text("Loc ${idx + 1}: ${match.players[playerIndex]}")
+                        Text("${totals[playerIndex]} pct")
                     }
                 }
             }
         }
+
         Text("Adaugă rundă")
         match.players.forEachIndexed { idx, player ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(player, modifier = Modifier.width(100.dp))
-                OutlinedTextField(value = inputs[idx], onValueChange = { inputs[idx] = it.filter(Char::isDigit) }, modifier = Modifier.weight(1f), singleLine = true)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(player, modifier = Modifier.width(90.dp))
+                OutlinedTextField(
+                    value = inputs[idx],
+                    onValueChange = { inputs[idx] = it.filter(Char::isDigit) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
+                )
+                listOf(0, 5, 10, 25, 50, 100).forEach { quick ->
+                    TextButton(onClick = { inputs[idx] = "$quick" }) { Text("$quick") }
+                }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf(0, 5, 10, 25, 50, 100).forEach { quick ->
-                Button(onClick = { for (i in inputs.indices) inputs[i] = "$quick" }) { Text("$quick") }
-            }
-        }
+
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = {
                 val scores = inputs.map { it.toIntOrNull() ?: 0 }
@@ -258,41 +299,59 @@ fun ActiveMatchScreen(match: Match, onBack: () -> Unit, onUpdate: (Match) -> Uni
             Button(onClick = { confirmUndo = true }, enabled = match.rounds.isNotEmpty()) { Text("Anulează ultima") }
             TextButton(onClick = { onFinish(match) }) { Text("Termină meci") }
         }
+
         Text("Istoric runde")
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(match.rounds.indices.toList()) { r ->
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("Runda ${r + 1}")
-                    Text(match.rounds[r].scores.joinToString(" | ") { s -> if (s == 0) "🟢0" else if (s >= 100) "🔴$s" else "$s" })
+                    Text(match.rounds[r].scores.joinToString(" | ") { score -> if (score == 0) "🟢0" else if (score >= 100) "🔴$score" else "$score" })
                 }
             }
-            item {
-                Text("Total: " + currentTotals.joinToString(" | "), fontWeight = FontWeight.Bold)
-            }
+            item { Text("Total: ${totals.joinToString(" | ")}", fontWeight = FontWeight.Bold) }
         }
     }
 
-    if (confirmUndo) AlertDialog(
-        onDismissRequest = { confirmUndo = false },
-        confirmButton = {
-            Button(onClick = {
-                onUpdate(match.copy(rounds = match.rounds.dropLast(1)))
-                confirmUndo = false
-            }) { Text("Da") }
-        },
-        dismissButton = { TextButton(onClick = { confirmUndo = false }) { Text("Nu") } },
-        title = { Text("Ștergere rundă") },
-        text = { Text("Sigur dorești anularea ultimei runde?") }
-    )
+    if (confirmUndo) {
+        AlertDialog(
+            onDismissRequest = { confirmUndo = false },
+            confirmButton = {
+                Button(onClick = {
+                    onUpdate(match.copy(rounds = match.rounds.dropLast(1)))
+                    confirmUndo = false
+                }) { Text("Da") }
+            },
+            dismissButton = { TextButton(onClick = { confirmUndo = false }) { Text("Nu") } },
+            title = { Text("Ștergere rundă") },
+            text = { Text("Sigur dorești anularea ultimei runde?") }
+        )
+    }
 
     if (showWinner) {
-        val winner = ranking.first()
+        val winnerIndex = match.winnerIndex()
         AlertDialog(
             onDismissRequest = { showWinner = false },
             confirmButton = { Button(onClick = { showWinner = false }) { Text("Continuă") } },
             dismissButton = { TextButton(onClick = { onFinish(match) }) { Text("Termină") } },
             title = { Text("🏆 Avem câștigător") },
-            text = { Text("${match.players[winner]} are cel mai mic scor: ${currentTotals[winner]} puncte") }
+            text = { Text("${match.players[winnerIndex]} are cel mai mic scor: ${totals[winnerIndex]} puncte") }
+        )
+    }
+
+    if (showInfo) {
+        AlertDialog(
+            onDismissRequest = { showInfo = false },
+            confirmButton = { Button(onClick = { showInfo = false }) { Text("OK") } },
+            title = { Text("Informații meci") },
+            text = {
+                Text(
+                    "Nume: ${match.name}\n" +
+                        "Data start: ${SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date(match.startDate))}\n" +
+                        "Scor de câștig: ${match.targetScore}\n" +
+                        "Runde: ${match.rounds.size}\n" +
+                        "Clasament: ${ranking.mapIndexed { i, p -> "${i + 1}. ${match.players[p]} (${totals[p]})" }.joinToString(", ")}"
+                )
+            }
         )
     }
 }
@@ -300,45 +359,55 @@ fun ActiveMatchScreen(match: Match, onBack: () -> Unit, onUpdate: (Match) -> Uni
 @Composable
 fun HistoryScreen(history: List<Match>, onBack: () -> Unit, onOpen: (Long) -> Unit, onDelete: (Long) -> Unit) {
     var deleteId by remember { mutableStateOf<Long?>(null) }
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row {
             Text("Istoric", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
             TextButton(onClick = onBack) { Text("Înapoi") }
         }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(history) { m ->
-                Card(modifier = Modifier.fillMaxWidth().clickable { onOpen(m.id) }) {
+            items(history) { match ->
+                val totals = match.totals()
+                val winner = match.players[match.winnerIndex()]
+                Card(modifier = Modifier.fillMaxWidth().clickable { onOpen(match.id) }) {
                     Column(Modifier.padding(10.dp)) {
-                        Text(m.name, fontWeight = FontWeight.Bold)
-                        Text(SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date(m.startDate)))
-                        val totals = m.players.mapIndexed { i, _ -> m.rounds.sumOf { it.scores[i] } }
-                        Text(m.players.zip(totals).joinToString { "${it.first}: ${it.second}" })
-                        Text(if (m.finished) "Terminat" else "În desfășurare")
-                        TextButton(onClick = { deleteId = m.id }) { Text("Șterge") }
+                        Text(match.name, fontWeight = FontWeight.Bold)
+                        Text(SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date(match.startDate)))
+                        Text(if (match.finished) "Terminat" else "În desfășurare")
+                        Text(match.players.zip(totals).joinToString { "${it.first}: ${it.second}" })
+                        if (match.finished) Text("Câștigător: $winner")
+                        TextButton(onClick = { deleteId = match.id }) { Text("Șterge") }
                     }
                 }
             }
         }
     }
-    if (deleteId != null) AlertDialog(
-        onDismissRequest = { deleteId = null },
-        confirmButton = { Button(onClick = { onDelete(deleteId!!); deleteId = null }) { Text("Șterge") } },
-        dismissButton = { TextButton(onClick = { deleteId = null }) { Text("Anulează") } },
-        title = { Text("Confirmare") },
-        text = { Text("Ștergi meciul selectat?") }
-    )
+
+    if (deleteId != null) {
+        AlertDialog(
+            onDismissRequest = { deleteId = null },
+            confirmButton = { Button(onClick = { onDelete(deleteId!!); deleteId = null }) { Text("Șterge") } },
+            dismissButton = { TextButton(onClick = { deleteId = null }) { Text("Anulează") } },
+            title = { Text("Confirmare") },
+            text = { Text("Ștergi meciul selectat?") }
+        )
+    }
 }
 
 @Composable
 fun MatchDetailsScreen(match: Match, onBack: () -> Unit) {
-    val totals = match.players.mapIndexed { i, _ -> match.rounds.sumOf { it.scores[i] } }
-    val winner = match.players.indices.minByOrNull { totals[it] } ?: 0
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    val totals = match.totals()
+    val winner = match.players[match.winnerIndex()]
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Text(match.name, style = MaterialTheme.typography.headlineSmall)
-        Text("Câștigător: ${match.players[winner]}")
-        Text("Scor final: " + match.players.zip(totals).joinToString { "${it.first} ${it.second}" })
-        match.rounds.forEachIndexed { i, r ->
-            Text("Runda ${i + 1}: ${r.scores.joinToString()} ")
+        Text("Câștigător: $winner")
+        Text("Scor final: ${match.players.zip(totals).joinToString { "${it.first} ${it.second}" }}")
+        match.rounds.forEachIndexed { i, round ->
+            Text("Runda ${i + 1}: ${round.scores.joinToString(" | ")}")
         }
         TextButton(onClick = onBack) { Text("Înapoi") }
     }
@@ -358,21 +427,31 @@ data class PlayerStats(
 @Composable
 fun StatsScreen(history: List<Match>, onBack: () -> Unit) {
     val stats = remember(history) {
+        val finishedMatches = history.filter { it.finished }
         val byName = mutableMapOf<String, MutableList<Pair<Match, Int>>>()
-        history.filter { it.finished }.forEach { m ->
-            val totals = m.players.mapIndexed { i, _ -> m.rounds.sumOf { it.scores[i] } }
-            m.players.forEachIndexed { idx, n -> byName.getOrPut(n) { mutableListOf() }.add(m to idx) }
-            val winner = totals.indices.minByOrNull { totals[it] }
-            m.players.forEachIndexed { idx, n -> if (idx == winner) byName[n]?.add(m to -1) }
+
+        finishedMatches.forEach { match ->
+            match.players.forEachIndexed { idx, playerName ->
+                byName.getOrPut(playerName) { mutableListOf() }.add(match to idx)
+            }
         }
-        byName.map { (name, list) ->
-            val participations = list.filter { it.second >= 0 }
-            val wins = list.count { it.second == -1 }
+
+        byName.map { (name, participations) ->
+            val wins = participations.count { (match, idx) -> match.winnerIndex() == idx }
             val rounds = participations.sumOf { it.first.rounds.size }
             val roundWins = participations.sumOf { (m, i) -> m.rounds.count { it.scores[i] == 0 } }
             val points = participations.sumOf { (m, i) -> m.rounds.sumOf { it.scores[i] } }
             val best = participations.minOfOrNull { (m, i) -> m.rounds.sumOf { it.scores[i] } } ?: 0
-            PlayerStats(name, participations.size, wins, rounds, roundWins, if (rounds == 0) 0.0 else points.toDouble() / rounds, best, if (participations.isEmpty()) 0.0 else wins * 100.0 / participations.size)
+            PlayerStats(
+                name = name,
+                matches = participations.size,
+                wins = wins,
+                rounds = rounds,
+                roundWins = roundWins,
+                avg = if (rounds == 0) 0.0 else points.toDouble() / rounds,
+                best = best,
+                winRate = if (participations.isEmpty()) 0.0 else wins * 100.0 / participations.size
+            )
         }.sortedByDescending { it.winRate }
     }
 
@@ -386,9 +465,11 @@ fun StatsScreen(history: List<Match>, onBack: () -> Unit) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(10.dp)) {
                         Text(s.name, fontWeight = FontWeight.Bold)
-                        Text("Meciuri: ${s.matches}, Câștigate: ${s.wins}, Rată: ${"%.1f".format(s.winRate)}%")
-                        Text("Runde: ${s.rounds}, Runde câștigate: ${s.roundWins}, Medie: ${"%.2f".format(s.avg)}")
-                        Text("Cel mai mic punctaj meci: ${s.best}")
+                        Text("Meciuri jucate: ${s.matches}")
+                        Text("Meciuri câștigate: ${s.wins} (${"%.1f".format(s.winRate)}%)")
+                        Text("Runde jucate: ${s.rounds} | Runde câștigate: ${s.roundWins}")
+                        Text("Punctaj mediu per rundă: ${"%.2f".format(s.avg)}")
+                        Text("Cel mai mic punctaj într-un meci: ${s.best}")
                     }
                 }
             }
