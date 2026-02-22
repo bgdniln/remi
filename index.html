@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Remi Scorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   REMI SCORER — "Joc de societate modern"
+   Scandinavian Playful Design
+   Warm terracotta + cream + sage green
+   Mobile-first, tap-friendly
+   ============================================ */
+
+:root {
+  --cream: #faf6f0;
+  --cream-dark: #f0ebe3;
+  --terracotta: #c75c2e;
+  --terracotta-light: #e07a4f;
+  --terracotta-dark: #a84a22;
+  --sage: #6b8f71;
+  --sage-light: #8fb396;
+  --sage-dark: #527a58;
+  --charcoal: #2d2d2d;
+  --charcoal-light: #4a4a4a;
+  --text-muted: #8a8078;
+  --text-light: #b0a89e;
+  --white: #ffffff;
+  --red: #d94040;
+  --red-bg: #fde8e8;
+  --green: #3a9e5c;
+  --green-bg: #e6f5ec;
+  --gold: #d4a843;
+  --gold-bg: #fdf5e6;
+  --border: #e8e0d8;
+  --shadow-sm: 0 1px 3px rgba(45,45,45,0.06);
+  --shadow-md: 0 4px 12px rgba(45,45,45,0.08);
+  --shadow-lg: 0 8px 30px rgba(45,45,45,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* ---- Screen Management ---- */
+.screen {
+  display: none;
+  min-height: 100dvh;
+  padding: 0 0 2rem 0;
+  animation: fadeIn 0.3s ease;
+}
+.screen.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.8); }
+  70% { transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ---- Header / Top Bar ---- */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  position: sticky;
+  top: 0;
+  background: var(--cream);
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+
+.top-bar .back-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--cream-dark);
+  border-radius: 12px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--charcoal);
+}
+.top-bar .back-btn:active { transform: scale(0.92); }
+
+.top-bar h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  flex: 1;
+  text-align: center;
+}
+
+.top-bar .action-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--cream-dark);
+  border-radius: 12px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--charcoal);
+}
+.top-bar .action-btn:active { transform: scale(0.92); }
+.top-bar .spacer { width: 40px; }
+
+/* ---- Container ---- */
+.content {
+  padding: 0 1.25rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* ---- Home Screen ---- */
+.home-header {
+  text-align: center;
+  padding: 3rem 1.25rem 1.5rem;
+}
+
+.home-logo {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.home-header h1 {
+  font-size: 2rem;
+  color: var(--charcoal);
+  margin-bottom: 0.25rem;
+}
+
+.home-header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.home-menu {
+  padding: 1rem 1.25rem;
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.15rem 1.25rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+}
+.menu-btn:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.menu-btn:active { transform: scale(0.98); }
+
+.menu-btn .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.menu-btn .icon.primary { background: var(--terracotta); color: white; }
+.menu-btn .icon.sage { background: var(--sage); color: white; }
+.menu-btn .icon.gold { background: var(--gold); color: white; }
+.menu-btn .icon.muted { background: var(--cream-dark); color: var(--charcoal); }
+
+.menu-btn .label h3 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 0.1rem;
+}
+.menu-btn .label p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.menu-btn .arrow {
+  margin-left: auto;
+  color: var(--text-light);
+  font-size: 1.2rem;
+}
+
+/* ---- Cards ---- */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ---- Form Elements ---- */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--charcoal-light);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: var(--charcoal);
+  background: var(--white);
+  transition: var(--transition);
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px rgba(199, 92, 46, 0.12);
+}
+.form-input::placeholder { color: var(--text-light); }
+
+.form-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.form-input-row .form-input { flex: 1; }
+
+.btn-generate {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--cream-dark);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.btn-generate:active { transform: scale(0.9); }
+
+/* ---- Player Count Selector ---- */
+.player-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.player-opt {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--charcoal-light);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+.player-opt.selected {
+  border-color: var(--terracotta);
+  background: var(--terracotta);
+  color: white;
+}
+.player-opt:active { transform: scale(0.95); }
+
+/* ---- Score Presets ---- */
+.score-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.score-preset {
+  padding: 0.55rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--white);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--charcoal-light);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.score-preset.selected {
+  border-color: var(--sage);
+  background: var(--sage);
+  color: white;
+}
+.score-preset:active { transform: scale(0.95); }
+
+/* ---- Primary Button ---- */
+.btn-primary {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--terracotta);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 14px rgba(199, 92, 46, 0.3);
+}
+.btn-primary:hover { background: var(--terracotta-dark); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 0.85rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--charcoal);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-secondary:active { transform: scale(0.97); }
+
+.btn-danger {
+  width: 100%;
+  padding: 0.85rem;
+  border: 2px solid var(--red);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--red);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-danger:active { transform: scale(0.97); }
+
+/* ---- Game Session: Leaderboard ---- */
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.lb-player {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.lb-player.first {
+  background: linear-gradient(135deg, var(--gold-bg), var(--white));
+  border: 2px solid var(--gold);
+  box-shadow: 0 2px 12px rgba(212, 168, 67, 0.15);
+}
+
+.lb-rank {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.lb-player.first .lb-rank {
+  background: var(--gold);
+  color: white;
+}
+.lb-player:not(.first) .lb-rank {
+  background: var(--cream-dark);
+  color: var(--text-muted);
+}
+
+.lb-name {
+  flex: 1;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--charcoal);
+}
+
+.lb-score {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--charcoal);
+}
+
+.lb-player.first .lb-score { color: var(--terracotta-dark); }
+
+/* ---- Progress Bar ---- */
+.lb-progress-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.lb-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--cream-dark);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.lb-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.lb-progress-fill.safe { background: var(--sage); }
+.lb-progress-fill.warning { background: var(--gold); }
+.lb-progress-fill.danger { background: var(--red); }
+
+/* ---- Round Input ---- */
+.round-input-section {
+  margin-bottom: 1.5rem;
+}
+
+.round-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.round-title .badge {
+  background: var(--terracotta);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.player-score-input {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding: 0.75rem;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.psi-name {
+  width: 80px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--charcoal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.psi-quick-btns {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.quick-btn {
+  padding: 0.4rem 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--white);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--charcoal-light);
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 36px;
+  text-align: center;
+}
+.quick-btn.selected {
+  border-color: var(--terracotta);
+  background: var(--terracotta);
+  color: white;
+}
+.quick-btn.zero.selected {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+.quick-btn:active { transform: scale(0.9); }
+
+.psi-custom {
+  width: 60px;
+  padding: 0.4rem 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xs);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--charcoal);
+  outline: none;
+  transition: var(--transition);
+}
+.psi-custom:focus {
+  border-color: var(--terracotta);
+}
+
+/* ---- Rounds History Table ---- */
+.rounds-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.rounds-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  font-size: 0.85rem;
+}
+
+.rounds-table th {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  padding: 0.65rem 0.5rem;
+  border-bottom: 2px solid var(--border);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  background: var(--white);
+}
+
+.rounds-table th:first-child { text-align: left; padding-left: 0.85rem; }
+
+.rounds-table td {
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--cream-dark);
+  font-weight: 500;
+}
+
+.rounds-table td:first-child {
+  text-align: left;
+  padding-left: 0.85rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.rounds-table tr:last-child td { border-bottom: none; }
+
+.rounds-table .total-row td {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border-top: 2px solid var(--border);
+  color: var(--charcoal);
+  padding: 0.75rem 0.5rem;
+}
+
+.score-zero {
+  color: var(--green);
+  font-weight: 700;
+  background: var(--green-bg);
+  border-radius: 6px;
+  padding: 0.1rem 0.4rem;
+}
+
+.score-high {
+  color: var(--red);
+  font-weight: 700;
+  background: var(--red-bg);
+  border-radius: 6px;
+  padding: 0.1rem 0.4rem;
+}
+
+/* ---- Winner Overlay ---- */
+.winner-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 45, 45, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.winner-overlay.active { display: flex; }
+
+.winner-card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+  animation: popIn 0.5s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.winner-trophy {
+  font-size: 4rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.winner-card h2 {
+  font-size: 1.5rem;
+  color: var(--charcoal);
+  margin-bottom: 0.25rem;
+}
+
+.winner-card .winner-name {
+  font-family: 'Nunito', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--terracotta);
+  margin-bottom: 0.5rem;
+}
+
+.winner-card .winner-score {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.winner-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ---- Confetti ---- */
+.confetti-piece {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  z-index: 1001;
+  animation: confetti-fall linear forwards;
+  pointer-events: none;
+}
+
+/* ---- History List ---- */
+.history-item {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.15rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.history-item:active { transform: scale(0.98); }
+
+.hi-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.hi-name {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--charcoal);
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.hi-status {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+.hi-status.finished { background: var(--green-bg); color: var(--green); }
+.hi-status.ongoing { background: var(--gold-bg); color: var(--gold); }
+
+.hi-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.hi-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hi-player-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--cream);
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.hi-player-chip.winner {
+  background: var(--gold-bg);
+  color: var(--terracotta-dark);
+}
+
+.hi-player-chip .chip-trophy { font-size: 0.7rem; }
+
+/* ---- Stats ---- */
+.stat-player-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.spc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.spc-name {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--charcoal);
+}
+
+.spc-winrate {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--terracotta);
+}
+
+.spc-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.spc-stat {
+  padding: 0.6rem;
+  background: var(--cream);
+  border-radius: var(--radius-xs);
+  text-align: center;
+}
+
+.spc-stat-value {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--charcoal);
+}
+
+.spc-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Match Detail ---- */
+.detail-section {
+  margin-bottom: 1.25rem;
+}
+
+.detail-section h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+/* ---- Info Modal ---- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 45, 45, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 900;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+.modal-overlay.active { display: flex; }
+
+.modal-sheet {
+  background: var(--white);
+  border-radius: 24px 24px 0 0;
+  padding: 1.5rem 1.25rem 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80dvh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 1.25rem;
+}
+
+.modal-sheet h3 {
+  font-size: 1.15rem;
+  color: var(--charcoal);
+  margin-bottom: 1rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--cream-dark);
+}
+
+.info-row:last-child { border-bottom: none; }
+
+.info-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.info-value {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--charcoal);
+}
+
+/* ---- Confirm Dialog ---- */
+.confirm-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 45, 45, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 950;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.confirm-overlay.active { display: flex; }
+
+.confirm-box {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1.75rem 1.5rem;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  animation: popIn 0.3s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.confirm-box h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.confirm-box p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.confirm-btns {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.confirm-btns button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+}
+
+.confirm-btns .confirm-cancel {
+  background: var(--cream-dark);
+  color: var(--charcoal);
+}
+
+.confirm-btns .confirm-ok {
+  background: var(--red);
+  color: white;
+}
+
+.confirm-btns .confirm-ok.sage {
+  background: var(--sage);
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.empty-state h3 {
+  font-size: 1.1rem;
+  color: var(--charcoal);
+  margin-bottom: 0.25rem;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ---- Undo Bar ---- */
+.undo-bar {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 460px;
+  width: calc(100% - 2.5rem);
+  z-index: 200;
+}
+
+.undo-bar button {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--charcoal);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition);
+}
+.undo-bar button:active { transform: scale(0.97); }
+
+/* ---- Delete Button ---- */
+.delete-match-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.85rem;
+  margin-top: 1.5rem;
+  border: 2px solid var(--red);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--red);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.delete-match-btn:active { transform: scale(0.97); }
+
+/* ---- Footer Suit Decoration ---- */
+.suits-deco {
+  text-align: center;
+  padding: 2rem 0 1rem;
+  color: var(--text-light);
+  font-size: 1.2rem;
+  letter-spacing: 0.5rem;
+  opacity: 0.4;
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HOME SCREEN ============ -->
+<div id="screen-home" class="screen active">
+  <div class="home-header">
+    <span class="home-logo">♠♥♦♣</span>
+    <h1>Remi Scorer</h1>
+    <p>Ține scorul la remi, simplu și rapid</p>
+  </div>
+  <div class="home-menu">
+    <button class="menu-btn" onclick="showScreen('screen-new-match')">
+      <div class="icon primary">🃏</div>
+      <div class="label">
+        <h3>Meci nou</h3>
+        <p>Pornește un meci nou de remi</p>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" id="btn-continue" style="display:none" onclick="continueMatch()">
+      <div class="icon sage">▶</div>
+      <div class="label">
+        <h3>Continuă meciul</h3>
+        <p id="continue-match-name">—</p>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showHistory()">
+      <div class="icon gold">📋</div>
+      <div class="label">
+        <h3>Istoric meciuri</h3>
+        <p>Toate meciurile jucate</p>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="showStats()">
+      <div class="icon muted">📊</div>
+      <div class="label">
+        <h3>Statistici</h3>
+        <p>Performanțele fiecărui jucător</p>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+  </div>
+  <div class="suits-deco">♠ ♥ ♦ ♣</div>
+</div>
+
+<!-- ============ NEW MATCH SCREEN ============ -->
+<div id="screen-new-match" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <h2>Meci nou</h2>
+    <div class="spacer"></div>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-top:1rem">
+      <div class="form-group">
+        <label class="form-label">Denumirea meciului</label>
+        <div class="form-input-row">
+          <input type="text" id="match-name" class="form-input" placeholder="ex: Meciul de sâmbătă seara">
+          <button class="btn-generate" onclick="generateMatchName()" title="Generează un nume amuzant">🎲</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Număr de jucători</label>
+        <div class="player-selector">
+          <button class="player-opt" data-count="2" onclick="setPlayerCount(2)">2</button>
+          <button class="player-opt selected" data-count="3" onclick="setPlayerCount(3)">3</button>
+          <button class="player-opt" data-count="4" onclick="setPlayerCount(4)">4</button>
+        </div>
+      </div>
+
+      <div class="form-group" id="player-names-group">
+        <label class="form-label">Numele jucătorilor</label>
+        <div id="player-names-inputs"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Scor de câștig (pierdere)</label>
+        <div class="score-presets" id="score-presets">
+          <button class="score-preset" data-score="500" onclick="setWinScore(500, this)">500</button>
+          <button class="score-preset selected" data-score="1000" onclick="setWinScore(1000, this)">1000</button>
+          <button class="score-preset" data-score="1500" onclick="setWinScore(1500, this)">1500</button>
+          <button class="score-preset" data-score="2000" onclick="setWinScore(2000, this)">2000</button>
+        </div>
+        <input type="number" id="custom-win-score" class="form-input" placeholder="Sau introdu altă valoare..." min="100" step="50">
+      </div>
+
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1.25rem; line-height:1.5;">
+        ⚠️ Jucătorul care atinge acest scor <strong>pierde</strong>. Câștigătorul este cel cu cel mai mic punctaj.
+      </p>
+
+      <button class="btn-primary" onclick="startMatch()">Începe meciul 🃏</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GAME SESSION SCREEN ============ -->
+<div id="screen-game" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="goHomeFromGame()">←</button>
+    <h2 id="game-title">Meci</h2>
+    <button class="action-btn" onclick="showMatchInfo()">ℹ️</button>
+  </div>
+  <div class="content">
+    <div id="game-leaderboard" class="leaderboard"></div>
+
+    <div class="round-input-section" id="round-input-section">
+      <div class="round-title">
+        Adaugă runda <span class="badge" id="round-number-badge">1</span>
+      </div>
+      <div id="round-inputs"></div>
+      <button class="btn-primary" onclick="addRound()" style="margin-top:0.75rem">Adaugă runda ✓</button>
+    </div>
+
+    <div id="rounds-history"></div>
+  </div>
+
+  <div class="undo-bar" id="undo-bar" style="display:none">
+    <button onclick="confirmUndoRound()">↩ Anulează ultima rundă</button>
+  </div>
+</div>
+
+<!-- ============ HISTORY SCREEN ============ -->
+<div id="screen-history" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <h2>Istoric meciuri</h2>
+    <div class="spacer"></div>
+  </div>
+  <div class="content" id="history-list"></div>
+</div>
+
+<!-- ============ MATCH DETAIL SCREEN ============ -->
+<div id="screen-detail" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showHistory()">←</button>
+    <h2>Detalii meci</h2>
+    <div class="spacer"></div>
+  </div>
+  <div class="content" id="detail-content"></div>
+</div>
+
+<!-- ============ STATS SCREEN ============ -->
+<div id="screen-stats" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('screen-home')">←</button>
+    <h2>Statistici</h2>
+    <div class="spacer"></div>
+  </div>
+  <div class="content" id="stats-content"></div>
+</div>
+
+<!-- ============ WINNER OVERLAY ============ -->
+<div class="winner-overlay" id="winner-overlay">
+  <div class="winner-card">
+    <span class="winner-trophy">🏆</span>
+    <h2>Felicitări!</h2>
+    <div class="winner-name" id="winner-name"></div>
+    <div class="winner-score" id="winner-score"></div>
+    <div class="winner-btns">
+      <button class="btn-primary" onclick="continueAfterWin()">Continuă meciul</button>
+      <button class="btn-secondary" onclick="endMatch()">Termină meciul</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INFO MODAL ============ -->
+<div class="modal-overlay" id="info-modal" onclick="closeInfoModal(event)">
+  <div class="modal-sheet" id="info-modal-content"></div>
+</div>
+
+<!-- ============ CONFIRM DIALOG ============ -->
+<div class="confirm-overlay" id="confirm-dialog">
+  <div class="confirm-box">
+    <h3 id="confirm-title">Confirmare</h3>
+    <p id="confirm-message">Ești sigur?</p>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="closeConfirm()">Anulează</button>
+      <button class="confirm-ok" id="confirm-ok-btn" onclick="confirmAction()">Da</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================
+   REMI SCORER — Application Logic
+   ============================================ */
+
+// ---- State ----
+let currentMatch = null;
+let matchHistory = [];
+let playerCount = 3;
+let winScore = 1000;
+let pendingConfirmAction = null;
+
+// ---- Funny Match Names ----
+const funnyNames = [
+  "Bătălia cărților rebele",
+  "Remiul legendar de pe canapea",
+  "Duelul asului pierdut",
+  "Seara cărților nebune",
+  "Războiul jockerilor",
+  "Remiul de la miezul nopții",
+  "Turneul canapelei",
+  "Cărțile destinului",
+  "Meciul celor curajoși",
+  "Remi în pijamale",
+  "Bătălia pe puncte",
+  "Remiul fără milă",
+  "Confruntarea de duminică",
+  "Cărțile norocului",
+  "Turneul prieteniei",
+  "Meciul surprizelor",
+  "Duelul maestrilor",
+  "Remiul de aur",
+  "Partida legendară",
+  "Seara punctajelor mari",
+  "Meciul campionilor",
+  "Cărțile vorbesc",
+  "Runda decisivă",
+  "Provocarea la remi",
+  "Meciul de poveste",
+  "Remiul cu năbădăi",
+  "Asul din mânecă",
+  "Jocul de pe balcon",
+  "Meciul cu prietenii",
+  "Remiul de la masa mare"
+];
+
+// ---- Init ----
+function init() {
+  loadData();
+  updateHomeScreen();
+  setPlayerCount(3);
+}
+
+// ---- LocalStorage ----
+function loadData() {
+  try {
+    const saved = localStorage.getItem('remi_current_match');
+    if (saved) currentMatch = JSON.parse(saved);
+    const hist = localStorage.getItem('remi_match_history');
+    if (hist) matchHistory = JSON.parse(hist);
+  } catch(e) {
+    console.error('Error loading data:', e);
+  }
+}
+
+function saveCurrentMatch() {
+  if (currentMatch) {
+    localStorage.setItem('remi_current_match', JSON.stringify(currentMatch));
+  } else {
+    localStorage.removeItem('remi_current_match');
+  }
+}
+
+function saveHistory() {
+  localStorage.setItem('remi_match_history', JSON.stringify(matchHistory));
+}
+
+// ---- Screen Navigation ----
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'screen-home') updateHomeScreen();
+}
+
+function updateHomeScreen() {
+  const btn = document.getElementById('btn-continue');
+  const label = document.getElementById('continue-match-name');
+  if (currentMatch && !currentMatch.finished) {
+    btn.style.display = 'flex';
+    label.textContent = currentMatch.name;
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+// ---- New Match Setup ----
+function generateMatchName() {
+  const name = funnyNames[Math.floor(Math.random() * funnyNames.length)];
+  document.getElementById('match-name').value = name;
+}
+
+function setPlayerCount(count) {
+  playerCount = count;
+  document.querySelectorAll('.player-opt').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.count) === count);
+  });
+  renderPlayerNameInputs();
+}
+
+function renderPlayerNameInputs() {
+  const container = document.getElementById('player-names-inputs');
+  container.innerHTML = '';
+  for (let i = 0; i < playerCount; i++) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'form-input';
+    input.placeholder = `Jucător ${i + 1}`;
+    input.id = `player-name-${i}`;
+    input.style.marginBottom = '0.5rem';
+    container.appendChild(input);
+  }
+}
+
+function setWinScore(score, btn) {
+  winScore = score;
+  document.getElementById('custom-win-score').value = '';
+  document.querySelectorAll('.score-preset').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+}
+
+// ---- Start Match ----
+function startMatch() {
+  let matchName = document.getElementById('match-name').value.trim();
+  if (!matchName) matchName = funnyNames[Math.floor(Math.random() * funnyNames.length)];
+
+  const customScore = parseInt(document.getElementById('custom-win-score').value);
+  if (customScore && customScore >= 50) {
+    winScore = customScore;
+    document.querySelectorAll('.score-preset').forEach(b => b.classList.remove('selected'));
+  }
+
+  const players = [];
+  for (let i = 0; i < playerCount; i++) {
+    const nameInput = document.getElementById(`player-name-${i}`);
+    let name = nameInput ? nameInput.value.trim() : '';
+    if (!name) name = `Jucător ${i + 1}`;
+    players.push({ name, totalScore: 0 });
+  }
+
+  currentMatch = {
+    id: Date.now().toString(),
+    name: matchName,
+    date: new Date().toISOString(),
+    winScore: winScore,
+    players: players,
+    rounds: [],
+    finished: false,
+    winner: null
+  };
+
+  saveCurrentMatch();
+  openGameSession();
+}
+
+function continueMatch() {
+  if (currentMatch) openGameSession();
+}
+
+// ---- Game Session ----
+function openGameSession() {
+  showScreen('screen-game');
+  document.getElementById('game-title').textContent = currentMatch.name;
+  renderLeaderboard();
+  renderRoundInputs();
+  renderRoundsHistory();
+  updateUndoBar();
+}
+
+function renderLeaderboard() {
+  const container = document.getElementById('game-leaderboard');
+  const sorted = currentMatch.players
+    .map((p, i) => ({ ...p, index: i }))
+    .sort((a, b) => a.totalScore - b.totalScore);
+
+  container.innerHTML = sorted.map((p, rank) => {
+    const pct = currentMatch.winScore > 0 ? Math.min((p.totalScore / currentMatch.winScore) * 100, 100) : 0;
+    let fillClass = 'safe';
+    if (pct > 70) fillClass = 'danger';
+    else if (pct > 40) fillClass = 'warning';
+
+    return `
+      <div class="lb-player ${rank === 0 ? 'first' : ''}">
+        <div class="lb-rank">${rank + 1}</div>
+        <div class="lb-progress-wrap">
+          <div class="lb-name">${escHtml(p.name)}</div>
+          <div class="lb-progress-bar">
+            <div class="lb-progress-fill ${fillClass}" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="lb-score">${p.totalScore}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderRoundInputs() {
+  const container = document.getElementById('round-inputs');
+  const roundNum = currentMatch.rounds.length + 1;
+  document.getElementById('round-number-badge').textContent = roundNum;
+
+  const quickValues = [0, 5, 10, 25, 50, 100];
+
+  container.innerHTML = currentMatch.players.map((p, i) => `
+    <div class="player-score-input" data-player="${i}">
+      <div class="psi-name">${escHtml(p.name)}</div>
+      <div class="psi-quick-btns">
+        ${quickValues.map(v => `
+          <button class="quick-btn ${v === 0 ? 'zero' : ''}" data-player="${i}" data-value="${v}" onclick="selectQuickScore(${i}, ${v}, this)">${v}</button>
+        `).join('')}
+      </div>
+      <input type="number" class="psi-custom" id="custom-score-${i}" placeholder="—" min="0" oninput="onCustomScore(${i})" onfocus="clearQuickSelection(${i})">
+    </div>
+  `).join('');
+}
+
+function selectQuickScore(playerIdx, value, btn) {
+  const row = btn.closest('.player-score-input');
+  row.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(`custom-score-${playerIdx}`).value = '';
+}
+
+function clearQuickSelection(playerIdx) {
+  const row = document.querySelector(`.player-score-input[data-player="${playerIdx}"]`);
+  if (row) row.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+}
+
+function onCustomScore(playerIdx) {
+  clearQuickSelection(playerIdx);
+}
+
+function getPlayerRoundScore(playerIdx) {
+  const row = document.querySelector(`.player-score-input[data-player="${playerIdx}"]`);
+  const selectedBtn = row ? row.querySelector('.quick-btn.selected') : null;
+  if (selectedBtn) return parseInt(selectedBtn.dataset.value);
+  const custom = document.getElementById(`custom-score-${playerIdx}`);
+  if (custom && custom.value !== '') return Math.max(0, parseInt(custom.value) || 0);
+  return null;
+}
+
+function addRound() {
+  const scores = [];
+  for (let i = 0; i < currentMatch.players.length; i++) {
+    const s = getPlayerRoundScore(i);
+    if (s === null) {
+      alert(`Introdu scorul pentru ${currentMatch.players[i].name}`);
+      return;
+    }
+    scores.push(s);
+  }
+
+  currentMatch.rounds.push(scores);
+  scores.forEach((s, i) => {
+    currentMatch.players[i].totalScore += s;
+  });
+
+  saveCurrentMatch();
+  renderLeaderboard();
+  renderRoundInputs();
+  renderRoundsHistory();
+  updateUndoBar();
+
+  // Check for winner
+  const loser = currentMatch.players.find(p => p.totalScore >= currentMatch.winScore);
+  if (loser) {
+    showWinner();
+  }
+}
+
+function renderRoundsHistory() {
+  const container = document.getElementById('rounds-history');
+  if (currentMatch.rounds.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const players = currentMatch.players;
+  let html = `<div class="rounds-table-wrap"><table class="rounds-table"><thead><tr><th>Runda</th>`;
+  players.forEach(p => { html += `<th>${escHtml(p.name)}</th>`; });
+  html += `</tr></thead><tbody>`;
+
+  currentMatch.rounds.forEach((scores, rIdx) => {
+    html += `<tr><td>R${rIdx + 1}</td>`;
+    scores.forEach(s => {
+      let cls = '';
+      if (s === 0) cls = 'score-zero';
+      else if (s >= 50) cls = 'score-high';
+      html += `<td>${cls ? `<span class="${cls}">${s}</span>` : s}</td>`;
+    });
+    html += `</tr>`;
+  });
+
+  // Total row
+  html += `<tr class="total-row"><td>Total</td>`;
+  players.forEach(p => { html += `<td>${p.totalScore}</td>`; });
+  html += `</tr></tbody></table></div>`;
+
+  container.innerHTML = html;
+}
+
+function updateUndoBar() {
+  document.getElementById('undo-bar').style.display = currentMatch.rounds.length > 0 ? 'block' : 'none';
+}
+
+// ---- Undo Round ----
+function confirmUndoRound() {
+  showConfirm('Anulează runda', `Vrei să anulezi runda ${currentMatch.rounds.length}?`, () => {
+    undoLastRound();
+  });
+}
+
+function undoLastRound() {
+  if (currentMatch.rounds.length === 0) return;
+  const lastScores = currentMatch.rounds.pop();
+  lastScores.forEach((s, i) => {
+    currentMatch.players[i].totalScore -= s;
+  });
+  saveCurrentMatch();
+  renderLeaderboard();
+  renderRoundInputs();
+  renderRoundsHistory();
+  updateUndoBar();
+}
+
+// ---- Winner ----
+function showWinner() {
+  const sorted = [...currentMatch.players].sort((a, b) => a.totalScore - b.totalScore);
+  const winner = sorted[0];
+  document.getElementById('winner-name').textContent = winner.name;
+  document.getElementById('winner-score').textContent = `Scor final: ${winner.totalScore} puncte`;
+  document.getElementById('winner-overlay').classList.add('active');
+  spawnConfetti();
+}
+
+function continueAfterWin() {
+  document.getElementById('winner-overlay').classList.remove('active');
+}
+
+function endMatch() {
+  document.getElementById('winner-overlay').classList.remove('active');
+  const sorted = [...currentMatch.players].sort((a, b) => a.totalScore - b.totalScore);
+  currentMatch.finished = true;
+  currentMatch.winner = sorted[0].name;
+  currentMatch.endDate = new Date().toISOString();
+
+  matchHistory.unshift({ ...currentMatch });
+  saveHistory();
+  currentMatch = null;
+  saveCurrentMatch();
+  showScreen('screen-home');
+}
+
+function spawnConfetti() {
+  const colors = ['#c75c2e', '#6b8f71', '#d4a843', '#e07a4f', '#527a58', '#d94040', '#3a9e5c'];
+  for (let i = 0; i < 50; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.width = (Math.random() * 8 + 6) + 'px';
+    piece.style.height = (Math.random() * 8 + 6) + 'px';
+    piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    piece.style.animationDelay = (Math.random() * 1) + 's';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+// ---- Match Info Modal ----
+function showMatchInfo() {
+  const m = currentMatch;
+  const sorted = [...m.players].sort((a, b) => a.totalScore - b.totalScore);
+  const date = new Date(m.date).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  let html = `
+    <div class="modal-handle"></div>
+    <h3>ℹ️ Informații meci</h3>
+    <div class="info-row"><span class="info-label">Denumire</span><span class="info-value">${escHtml(m.name)}</span></div>
+    <div class="info-row"><span class="info-label">Data începerii</span><span class="info-value">${date}</span></div>
+    <div class="info-row"><span class="info-label">Scor de câștig</span><span class="info-value">${m.winScore} puncte</span></div>
+    <div class="info-row"><span class="info-label">Runde jucate</span><span class="info-value">${m.rounds.length}</span></div>
+    <div style="margin-top:1rem">
+      <div class="form-label">Clasament actual</div>
+      ${sorted.map((p, i) => `
+        <div class="info-row">
+          <span class="info-label">${i + 1}. ${escHtml(p.name)}</span>
+          <span class="info-value">${p.totalScore} pct</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  document.getElementById('info-modal-content').innerHTML = html;
+  document.getElementById('info-modal').classList.add('active');
+}
+
+function closeInfoModal(e) {
+  if (e.target === document.getElementById('info-modal')) {
+    document.getElementById('info-modal').classList.remove('active');
+  }
+}
+
+function goHomeFromGame() {
+  saveCurrentMatch();
+  showScreen('screen-home');
+}
+
+// ---- History ----
+function showHistory() {
+  showScreen('screen-history');
+  renderHistoryList();
+}
+
+function renderHistoryList() {
+  const container = document.getElementById('history-list');
+
+  // Also include current match if active
+  let allMatches = [...matchHistory];
+
+  if (allMatches.length === 0 && !currentMatch) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">📋</span>
+        <h3>Niciun meci încă</h3>
+        <p>Începe un meci nou pentru a vedea istoricul aici.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = allMatches.map(m => {
+    const date = new Date(m.date).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
+    const sorted = [...m.players].sort((a, b) => a.totalScore - b.totalScore);
+
+    return `
+      <div class="history-item" onclick="showMatchDetail('${m.id}')">
+        <div class="hi-top">
+          <div class="hi-name">${escHtml(m.name)}</div>
+          <span class="hi-status ${m.finished ? 'finished' : 'ongoing'}">${m.finished ? 'Terminat' : 'În desfășurare'}</span>
+        </div>
+        <div class="hi-date">${date}</div>
+        <div class="hi-players">
+          ${sorted.map((p, i) => `
+            <span class="hi-player-chip ${i === 0 && m.finished ? 'winner' : ''}">
+              ${i === 0 && m.finished ? '<span class="chip-trophy">🏆</span>' : ''}
+              ${escHtml(p.name)}: ${p.totalScore}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ---- Match Detail ----
+function showMatchDetail(matchId) {
+  const m = matchHistory.find(h => h.id === matchId);
+  if (!m) return;
+
+  showScreen('screen-detail');
+  const container = document.getElementById('detail-content');
+  const date = new Date(m.date).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const sorted = [...m.players].sort((a, b) => a.totalScore - b.totalScore);
+
+  let html = `
+    <div class="card" style="margin-top:1rem">
+      <h3 style="font-size:1.15rem; margin-bottom:0.25rem;">${escHtml(m.name)}</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${date}</p>
+      <div class="info-row"><span class="info-label">Stare</span><span class="info-value">${m.finished ? 'Terminat' : 'În desfășurare'}</span></div>
+      <div class="info-row"><span class="info-label">Scor de câștig</span><span class="info-value">${m.winScore}</span></div>
+      <div class="info-row"><span class="info-label">Runde jucate</span><span class="info-value">${m.rounds.length}</span></div>
+      ${m.winner ? `<div class="info-row"><span class="info-label">Câștigător</span><span class="info-value" style="color:var(--terracotta)">🏆 ${escHtml(m.winner)}</span></div>` : ''}
+    </div>
+
+    <div class="detail-section">
+      <h3>Clasament final</h3>
+      <div class="leaderboard">
+        ${sorted.map((p, i) => `
+          <div class="lb-player ${i === 0 ? 'first' : ''}">
+            <div class="lb-rank">${i + 1}</div>
+            <div class="lb-name">${escHtml(p.name)}</div>
+            <div class="lb-score">${p.totalScore}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  if (m.rounds.length > 0) {
+    html += `<div class="detail-section"><h3>Toate rundele</h3><div class="rounds-table-wrap"><table class="rounds-table"><thead><tr><th>Runda</th>`;
+    m.players.forEach(p => { html += `<th>${escHtml(p.name)}</th>`; });
+    html += `</tr></thead><tbody>`;
+
+    m.rounds.forEach((scores, rIdx) => {
+      html += `<tr><td>R${rIdx + 1}</td>`;
+      scores.forEach(s => {
+        let cls = '';
+        if (s === 0) cls = 'score-zero';
+        else if (s >= 50) cls = 'score-high';
+        html += `<td>${cls ? `<span class="${cls}">${s}</span>` : s}</td>`;
+      });
+      html += `</tr>`;
+    });
+
+    html += `<tr class="total-row"><td>Total</td>`;
+    m.players.forEach(p => { html += `<td>${p.totalScore}</td>`; });
+    html += `</tr></tbody></table></div></div>`;
+  }
+
+  html += `<button class="delete-match-btn" onclick="confirmDeleteMatch('${m.id}')">🗑 Șterge meciul</button>`;
+
+  container.innerHTML = html;
+}
+
+function confirmDeleteMatch(matchId) {
+  showConfirm('Șterge meciul', 'Ești sigur că vrei să ștergi acest meci? Acțiunea este ireversibilă.', () => {
+    matchHistory = matchHistory.filter(m => m.id !== matchId);
+    saveHistory();
+    showHistory();
+  });
+}
+
+// ---- Statistics ----
+function showStats() {
+  showScreen('screen-stats');
+  renderStats();
+}
+
+function renderStats() {
+  const container = document.getElementById('stats-content');
+
+  // Gather all finished matches
+  const finished = matchHistory.filter(m => m.finished);
+  if (finished.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">📊</span>
+        <h3>Nicio statistică încă</h3>
+        <p>Termină un meci pentru a vedea statisticile jucătorilor.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Aggregate per player
+  const playerMap = {};
+
+  finished.forEach(m => {
+    const sorted = [...m.players].sort((a, b) => a.totalScore - b.totalScore);
+    const winnerName = sorted[0].name;
+
+    m.players.forEach((p, pIdx) => {
+      if (!playerMap[p.name]) {
+        playerMap[p.name] = {
+          name: p.name,
+          matchesPlayed: 0,
+          matchesWon: 0,
+          roundsPlayed: 0,
+          roundsWon: 0,
+          totalPoints: 0,
+          bestScore: Infinity
+        };
+      }
+      const stat = playerMap[p.name];
+      stat.matchesPlayed++;
+      if (p.name === winnerName) stat.matchesWon++;
+      stat.roundsPlayed += m.rounds.length;
+      stat.bestScore = Math.min(stat.bestScore, p.totalScore);
+      stat.totalPoints += p.totalScore;
+
+      m.rounds.forEach(round => {
+        if (round[pIdx] === 0) stat.roundsWon++;
+      });
+    });
+  });
+
+  const playerStats = Object.values(playerMap).sort((a, b) => {
+    const rateA = a.matchesPlayed > 0 ? a.matchesWon / a.matchesPlayed : 0;
+    const rateB = b.matchesPlayed > 0 ? b.matchesWon / b.matchesPlayed : 0;
+    return rateB - rateA;
+  });
+
+  container.innerHTML = playerStats.map(s => {
+    const winRate = s.matchesPlayed > 0 ? Math.round((s.matchesWon / s.matchesPlayed) * 100) : 0;
+    const avgPerRound = s.roundsPlayed > 0 ? (s.totalPoints / s.roundsPlayed).toFixed(1) : '—';
+
+    return `
+      <div class="stat-player-card">
+        <div class="spc-header">
+          <div class="spc-name">${escHtml(s.name)}</div>
+          <div class="spc-winrate">${winRate}% victorii</div>
+        </div>
+        <div class="spc-stats">
+          <div class="spc-stat">
+            <div class="spc-stat-value">${s.matchesPlayed}</div>
+            <div class="spc-stat-label">Meciuri jucate</div>
+          </div>
+          <div class="spc-stat">
+            <div class="spc-stat-value">${s.matchesWon}</div>
+            <div class="spc-stat-label">Meciuri câștigate</div>
+          </div>
+          <div class="spc-stat">
+            <div class="spc-stat-value">${s.roundsPlayed}</div>
+            <div class="spc-stat-label">Runde jucate</div>
+          </div>
+          <div class="spc-stat">
+            <div class="spc-stat-value">${s.roundsWon}</div>
+            <div class="spc-stat-label">Runde câștigate</div>
+          </div>
+          <div class="spc-stat">
+            <div class="spc-stat-value">${avgPerRound}</div>
+            <div class="spc-stat-label">Punctaj mediu/rundă</div>
+          </div>
+          <div class="spc-stat">
+            <div class="spc-stat-value">${s.bestScore === Infinity ? '—' : s.bestScore}</div>
+            <div class="spc-stat-label">Cel mai mic punctaj</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ---- Confirm Dialog ----
+function showConfirm(title, message, onConfirm, isSafe) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+  const okBtn = document.getElementById('confirm-ok-btn');
+  okBtn.className = isSafe ? 'confirm-ok sage' : 'confirm-ok';
+  okBtn.textContent = 'Da';
+  pendingConfirmAction = onConfirm;
+  document.getElementById('confirm-dialog').classList.add('active');
+}
+
+function confirmAction() {
+  document.getElementById('confirm-dialog').classList.remove('active');
+  if (pendingConfirmAction) {
+    pendingConfirmAction();
+    pendingConfirmAction = null;
+  }
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-dialog').classList.remove('active');
+  pendingConfirmAction = null;
+}
+
+// ---- Utilities ----
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ---- Custom win score input handler ----
+document.getElementById('custom-win-score').addEventListener('input', function() {
+  if (this.value) {
+    document.querySelectorAll('.score-preset').forEach(b => b.classList.remove('selected'));
+    winScore = parseInt(this.value) || 1000;
+  }
+});
+
+// ---- Initialize ----
+init();
+</script>
+</body>
+</html>
